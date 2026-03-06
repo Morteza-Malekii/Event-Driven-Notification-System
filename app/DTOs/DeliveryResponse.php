@@ -2,13 +2,13 @@
 
 namespace App\DTOs;
 
-class DeliveryResponse
+final readonly class DeliveryResponse
 {
     public function __construct(
-        public readonly string $messageId,
-        public readonly string $status,
-        public readonly string $sentAt,
-        public readonly string $provider,
-        public readonly array  $metadata = [],
+        public string $messageId,
+        public string $status,
+        public string $timestamp,
+        public string $provider,
+        public array  $rawResponse = [],
     ) {}
 }

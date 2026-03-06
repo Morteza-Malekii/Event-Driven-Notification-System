@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Redis;
 class MetricsService
 {
     private const LATENCY_SAMPLE_SIZE = 1000;
-    private const PREFIX = 'metrics:notifications:';
+    private const PREFIX = 'metrics:';
 
     public function incrementSent(NotificationChannel $channel): void
     {

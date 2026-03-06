@@ -18,15 +18,20 @@ class EventServiceProvider extends ServiceProvider
             DispatchNotificationJobListener::class,
         ],
         NotificationSent::class => [
-            RecordMetricsListener::class,
+            [RecordMetricsListener::class, 'handleSent'],
             SyncBatchCountersListener::class,
         ],
         NotificationFailed::class => [
-            RecordMetricsListener::class,
+            [RecordMetricsListener::class, 'handleFailed'],
             SyncBatchCountersListener::class,
         ],
         NotificationCanceled::class => [
             SyncBatchCountersListener::class,
         ],
     ];
+
+    public function shouldDiscoverEvents(): bool
+    {
+        return false;
+    }
 }

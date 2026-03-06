@@ -12,14 +12,15 @@ class RecordMetricsListener
         private readonly MetricsService $metrics,
     ) {}
 
-    public function handle(NotificationSent|NotificationFailed $event): void
+    public function handleSent(NotificationSent $event): void
     {
-        if ($event instanceof NotificationSent) {
-            $this->metrics->incrementSent($event->notification->channel);
-            $this->metrics->recordLatency($event->notification->channel, $event->durationMs);
-        } else {
-            $this->metrics->incrementFailed($event->notification->channel);
-            $this->metrics->recordLatency($event->notification->channel, $event->durationMs);
-        }
+        $this->metrics->incrementSent($event->notification->channel);
+        $this->metrics->recordLatency($event->notification->channel, $event->durationMs);
+    }
+
+    public function handleFailed(NotificationFailed $event): void
+    {
+        $this->metrics->incrementFailed($event->notification->channel);
+        $this->metrics->recordLatency($event->notification->channel, $event->durationMs);
     }
 }

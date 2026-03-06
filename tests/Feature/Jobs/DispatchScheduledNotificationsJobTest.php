@@ -27,7 +27,7 @@ class DispatchScheduledNotificationsJobTest extends TestCase
         Event::assertDispatched(NotificationCreated::class);
     }
 
-    public function test_does_not_fire_for_future_notifications(): void
+    public function test_ignores_future_notifications(): void
     {
         Event::fake([NotificationCreated::class]);
         Notification::factory()->create([

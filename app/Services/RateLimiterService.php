@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Redis;
 
 class RateLimiterService
 {
-    private const WINDOW_SECONDS = 60;
+    private const WINDOW_SECONDS = 1;
 
     private string $luaScript = <<<'LUA'
         local key    = KEYS[1]

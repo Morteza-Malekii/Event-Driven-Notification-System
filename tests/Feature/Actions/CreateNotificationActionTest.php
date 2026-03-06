@@ -8,11 +8,18 @@ use App\Exceptions\DuplicateIdempotencyKeyException;
 use App\Models\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Redis;
 use Tests\TestCase;
 
 class CreateNotificationActionTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Redis::del(['idempotency:idem-001', 'idempotency:idem-002', 'idempotency:idem-003']);
+    }
 
     public function test_creates_notification(): void
     {

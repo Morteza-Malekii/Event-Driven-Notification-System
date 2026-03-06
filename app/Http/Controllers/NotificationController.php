@@ -81,7 +81,7 @@ class NotificationController extends Controller
 
             return ApiResponse::success(new NotificationResource($notification));
         } catch (CancellationNotAllowedException $e) {
-            return ApiResponse::error('CANCELLATION_NOT_ALLOWED', $e->getMessage(), 422);
+            return ApiResponse::error('CANCELLATION_NOT_ALLOWED', $e->getMessage(), 409);
         }
     }
 }

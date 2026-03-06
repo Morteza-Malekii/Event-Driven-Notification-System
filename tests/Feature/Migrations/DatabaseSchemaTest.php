@@ -36,11 +36,13 @@ class DatabaseSchemaTest extends TestCase
     public function test_idempotency_key_is_unique(): void
     {
         DB::table('idempotency_keys')->insert([
+            'id' => \Illuminate\Support\Str::uuid(),
             'key' => 'test-key', 'request_hash' => 'abc',
             'expires_at' => now()->addDay(),
         ]);
         $this->expectException(\Illuminate\Database\QueryException::class);
         DB::table('idempotency_keys')->insert([
+            'id' => \Illuminate\Support\Str::uuid(),
             'key' => 'test-key', 'request_hash' => 'xyz',
             'expires_at' => now()->addDay(),
         ]);

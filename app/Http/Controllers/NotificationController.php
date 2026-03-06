@@ -26,7 +26,9 @@ class NotificationController extends Controller
 
             $notification = $action->execute($data);
 
-            return ApiResponse::success(new NotificationResource($notification), 201);
+            $status = $notification->wasRecentlyCreated ? 201 : 200;
+
+            return ApiResponse::success(new NotificationResource($notification), $status);
         } catch (DuplicateIdempotencyKeyException $e) {
             return ApiResponse::error('DUPLICATE_IDEMPOTENCY_KEY', $e->getMessage(), 409);
         }

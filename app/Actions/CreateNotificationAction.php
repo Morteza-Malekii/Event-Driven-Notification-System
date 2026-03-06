@@ -19,8 +19,9 @@ class CreateNotificationAction
         $hash = null;
 
         if ($key) {
-            $hash   = $this->idempotency->hashRequest($data);
-            $cached = $this->idempotency->check($key, $hash);
+            $hashData = array_diff_key($data, array_flip(['idempotency_key', 'correlation_id', 'batch_id']));
+            $hash     = $this->idempotency->hashRequest($hashData);
+            $cached   = $this->idempotency->check($key, $hash);
 
             if ($cached) {
                 return Notification::find($cached['notification_id']);

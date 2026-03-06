@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\DTOs\DeliveryResponse;
 use App\Enums\NotificationChannel;
 use App\Enums\NotificationPriority;
 use App\Enums\NotificationStatus;
@@ -73,7 +74,7 @@ class Notification extends Model
         return $query->where('status', $status);
     }
 
-    public function scopeOfChannel($query, NotificationChannel $channel)
+    public function scopeOfChannel($query, NotificationChannel|string $channel)
     {
         return $query->where('channel', $channel);
     }
@@ -107,12 +108,12 @@ class Notification extends Model
         ]);
     }
 
-    public function markAsSent(string $providerMessageId = null): bool
+    public function markAsSent(DeliveryResponse $response): bool
     {
         return $this->updateQuietly([
             'status'              => NotificationStatus::SENT,
             'sent_at'             => now(),
-            'provider_message_id' => $providerMessageId,
+            'provider_message_id' => $response->messageId,
             'last_attempted_at'   => now(),
         ]);
     }

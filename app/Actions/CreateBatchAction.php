@@ -38,7 +38,12 @@ class CreateBatchAction
                 }
             }
 
-            return compact('batch', 'created', 'failed', 'errors');
+            return [
+                'batch'   => $batch,
+                'created' => count($created),
+                'failed'  => count($failed),
+                'errors'  => $errors,
+            ];
         });
     }
 }

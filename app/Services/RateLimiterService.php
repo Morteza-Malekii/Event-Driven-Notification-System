@@ -57,7 +57,7 @@ class RateLimiterService
 
     public function getLimit(): int
     {
-        return (int) config('services.notification.rate_limit', 100);
+        return (int) config('notification.rate_limit', 100);
     }
 
     private function key(NotificationChannel $channel): string

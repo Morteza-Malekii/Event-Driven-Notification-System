@@ -10,4 +10,12 @@ enum BatchStatus: string
     case PARTIAL_FAILED = 'partial_failed';
     case FAILED = 'failed';
     case CANCELED = 'canceled';
+
+    public function isTerminal(): bool
+    {
+        return match($this) {
+            self::COMPLETED, self::PARTIAL_FAILED, self::FAILED, self::CANCELED => true,
+            default => false,
+        };
+    }
 }

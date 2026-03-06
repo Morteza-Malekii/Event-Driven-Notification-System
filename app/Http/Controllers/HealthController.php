@@ -13,15 +13,18 @@ class HealthController extends Controller
 {
     public function __invoke(): JsonResponse
     {
-        $checks = [
+        $services = [
             'database' => $this->checkDatabase(),
             'redis'    => $this->checkRedis(),
             'cache'    => $this->checkCache(),
         ];
 
-        $healthy = collect($checks)->every(fn($c) => $c['status'] === 'ok');
+        $healthy = collect($services)->every(fn($c) => $c['status'] === 'ok');
 
-        return ApiResponse::success($checks, $healthy ? 200 : 503);
+        return ApiResponse::success([
+            'status'   => $healthy ? 'healthy' : 'degraded',
+            'services' => $services,
+        ], $healthy ? 200 : 503);
     }
 
     private function checkDatabase(): array

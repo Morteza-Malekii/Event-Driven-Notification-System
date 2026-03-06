@@ -8,10 +8,10 @@ class ApiResponse
 {
     public static function success(mixed $data, int $status = 200, ?array $pagination = null): JsonResponse
     {
-        $payload = ['data' => $data];
+        $payload = ['success' => true, 'data' => $data];
 
         if ($pagination !== null) {
-            $payload['pagination'] = $pagination;
+            $payload['meta'] = ['pagination' => $pagination];
         }
 
         return response()->json($payload, $status);

@@ -16,6 +16,13 @@ class Notification extends Model
 {
     use HasFactory, HasUuids;
 
+    protected $attributes = [
+        'status'        => 'pending',
+        'priority'      => 'normal',
+        'max_attempts'  => 3,
+        'attempt_count' => 0,
+    ];
+
     protected $fillable = [
         'batch_id',
         'channel',

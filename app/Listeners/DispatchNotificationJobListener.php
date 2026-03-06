@@ -5,9 +5,8 @@ namespace App\Listeners;
 use App\Events\NotificationCreated;
 use App\Events\NotificationDispatched;
 use App\Jobs\ProcessNotificationJob;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
-class DispatchNotificationJobListener implements ShouldQueue
+class DispatchNotificationJobListener
 {
     public function handle(NotificationCreated $event): void
     {

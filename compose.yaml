@@ -25,6 +25,39 @@ services:
             - mysql
             - redis
             - phpmyadmin
+
+    queue-worker:
+        image: 'sail-8.5/app'
+        command: php artisan queue:work --queue=notifications-high,notifications-normal,notifications-low --tries=3 --timeout=30
+        environment:
+            WWWUSER: '${WWWUSER}'
+            LARAVEL_SAIL: 1
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+        depends_on:
+            - laravel.test
+            - mysql
+            - redis
+        restart: unless-stopped
+
+    scheduler:
+        image: 'sail-8.5/app'
+        command: php artisan schedule:work
+        environment:
+            WWWUSER: '${WWWUSER}'
+            LARAVEL_SAIL: 1
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+        depends_on:
+            - laravel.test
+            - mysql
+            - redis
+        restart: unless-stopped
+
     mysql:
         image: 'mysql:8.4'
         ports:
@@ -50,6 +83,7 @@ services:
                 - '-p${DB_PASSWORD}'
             retries: 3
             timeout: 5s
+
     redis:
         image: 'redis:alpine'
         ports:
@@ -65,6 +99,7 @@ services:
                 - ping
             retries: 3
             timeout: 5s
+
     phpmyadmin:
         image: 'phpmyadmin/phpmyadmin'
         ports:
@@ -77,9 +112,11 @@ services:
             - sail
         depends_on:
             - mysql
+
 networks:
     sail:
         driver: bridge
+
 volumes:
     sail-mysql:
         driver: local

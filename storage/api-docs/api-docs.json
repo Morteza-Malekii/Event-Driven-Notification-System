@@ -1,0 +1,910 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Notification System API",
+        "description": "Event-driven notification system supporting SMS, Email, and Push channels with priority queues, rate limiting, retry logic, and idempotency.",
+        "contact": {
+            "email": "admin@example.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api",
+            "description": "API Server"
+        }
+    ],
+    "paths": {
+        "/health": {
+            "get": {
+                "tags": [
+                    "Observability"
+                ],
+                "summary": "Health check",
+                "description": "Returns the health status of database, Redis, and cache services.",
+                "operationId": "63ca574ccc7f0d914cdced2f70f30b57",
+                "responses": {
+                    "200": {
+                        "description": "All services healthy",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "healthy",
+                                                        "degraded"
+                                                    ]
+                                                },
+                                                "services": {
+                                                    "properties": {
+                                                        "database": {
+                                                            "properties": {
+                                                                "status": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "redis": {
+                                                            "properties": {
+                                                                "status": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "cache": {
+                                                            "properties": {
+                                                                "status": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "One or more services degraded"
+                    }
+                }
+            }
+        },
+        "/metrics": {
+            "get": {
+                "tags": [
+                    "Observability"
+                ],
+                "summary": "Real-time metrics",
+                "description": "Returns queue depths, sent/failed counts, and average latency per channel.",
+                "operationId": "977450e1a6a6fe8591ac871c0d7803ac",
+                "responses": {
+                    "200": {
+                        "description": "Metrics snapshot",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "notifications": {
+                                                    "properties": {
+                                                        "sent": {
+                                                            "type": "integer"
+                                                        },
+                                                        "failed": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "channels": {
+                                                    "properties": {
+                                                        "sms": {
+                                                            "properties": {
+                                                                "sent": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "failed": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "avg_latency_ms": {
+                                                                    "type": "number",
+                                                                    "nullable": true
+                                                                },
+                                                                "sample_count": {
+                                                                    "type": "integer"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "queues": {
+                                                    "type": "object"
+                                                },
+                                                "generated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/batches": {
+            "post": {
+                "tags": [
+                    "Batches"
+                ],
+                "summary": "Create a batch of notifications",
+                "description": "Creates up to 1000 notifications in a single request.",
+                "operationId": "4ea2e8a3e2b899982d18be5f5ff50bfb",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "notifications"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Flash sale campaign"
+                                    },
+                                    "metadata": {
+                                        "type": "object"
+                                    },
+                                    "notifications": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "channel",
+                                                "recipient",
+                                                "content"
+                                            ],
+                                            "properties": {
+                                                "channel": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "sms",
+                                                        "email",
+                                                        "push"
+                                                    ]
+                                                },
+                                                "recipient": {
+                                                    "type": "string"
+                                                },
+                                                "content": {
+                                                    "type": "string"
+                                                },
+                                                "priority": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "high",
+                                                        "normal",
+                                                        "low"
+                                                    ]
+                                                },
+                                                "metadata": {
+                                                    "type": "object"
+                                                },
+                                                "scheduled_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "maxItems": 1000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Batch created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "batch": {
+                                                    "$ref": "#/components/schemas/NotificationBatchResource"
+                                                },
+                                                "created": {
+                                                    "type": "integer"
+                                                },
+                                                "failed": {
+                                                    "type": "integer"
+                                                },
+                                                "errors": {
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/batches/{id}": {
+            "get": {
+                "tags": [
+                    "Batches"
+                ],
+                "summary": "Get a batch",
+                "description": "Returns the batch status and counters by UUID.",
+                "operationId": "c0a7cd7f431a32596621369243cf9b4f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Batch UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Batch found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/NotificationBatchResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/notifications": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "List notifications",
+                "description": "Returns a paginated list of notifications with optional filters.",
+                "operationId": "0f031f66cd8c52bf73e89fb2d050ad83",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "scheduled",
+                                "queued",
+                                "processing",
+                                "sent",
+                                "failed",
+                                "canceled"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "channel",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "sms",
+                                "email",
+                                "push"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "priority",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "high",
+                                "normal",
+                                "low"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "description": "Start date (Y-m-d)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "description": "End date (Y-m-d)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/NotificationResource"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Create a notification",
+                "description": "Creates a single notification and dispatches it to the queue. Supports idempotency via idempotency_key field.",
+                "operationId": "258ba7c348fd4283c6b3802a69fe2fb0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "channel",
+                                    "recipient",
+                                    "content"
+                                ],
+                                "properties": {
+                                    "channel": {
+                                        "type": "string",
+                                        "enum": [
+                                            "sms",
+                                            "email",
+                                            "push"
+                                        ],
+                                        "example": "sms"
+                                    },
+                                    "recipient": {
+                                        "type": "string",
+                                        "example": "+905551234567"
+                                    },
+                                    "content": {
+                                        "type": "string",
+                                        "example": "Your OTP is 1234"
+                                    },
+                                    "priority": {
+                                        "type": "string",
+                                        "enum": [
+                                            "high",
+                                            "normal",
+                                            "low"
+                                        ],
+                                        "example": "normal"
+                                    },
+                                    "metadata": {
+                                        "type": "object"
+                                    },
+                                    "scheduled_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    },
+                                    "idempotency_key": {
+                                        "type": "string",
+                                        "example": "order-456-sms"
+                                    },
+                                    "max_attempts": {
+                                        "type": "integer",
+                                        "example": 3
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Notification created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/NotificationResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Idempotency replay — returning existing notification",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Idempotency key conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/notifications/{id}": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Get a notification",
+                "description": "Returns a notification by UUID including all delivery attempts.",
+                "operationId": "0c8e017ab6d765f82f97368b80f52b8e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Notification UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Notification found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/NotificationResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/notifications/{id}/cancel": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Cancel a notification",
+                "description": "Cancels a pending or queued notification. Sent or failed notifications cannot be canceled.",
+                "operationId": "720ac8cabdbc8779671078c574baab9e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Notification UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Notification canceled",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/NotificationResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Cannot cancel in current state",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "NotificationResource": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "batch_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "channel": {
+                        "type": "string",
+                        "enum": [
+                            "sms",
+                            "email",
+                            "push"
+                        ]
+                    },
+                    "priority": {
+                        "type": "string",
+                        "enum": [
+                            "high",
+                            "normal",
+                            "low"
+                        ]
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "scheduled",
+                            "queued",
+                            "processing",
+                            "sent",
+                            "failed",
+                            "canceled"
+                        ]
+                    },
+                    "recipient": {
+                        "type": "string",
+                        "example": "+905551234567"
+                    },
+                    "content": {
+                        "type": "string",
+                        "example": "Your OTP is 1234"
+                    },
+                    "metadata": {
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "idempotency_key": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "correlation_id": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "provider_message_id": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "error_message": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "max_attempts": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "attempt_count": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "scheduled_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "queued_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "sent_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "failed_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "canceled_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "delivery_attempts": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DeliveryAttemptResource"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "DeliveryAttemptResource": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "attempt_number": {
+                        "type": "integer"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "success",
+                            "failed",
+                            "rate_limited"
+                        ]
+                    },
+                    "provider": {
+                        "type": "string"
+                    },
+                    "provider_message_id": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "error_message": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "is_transient_failure": {
+                        "type": "boolean"
+                    },
+                    "duration_ms": {
+                        "type": "integer"
+                    },
+                    "attempted_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "NotificationBatchResource": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "processing",
+                            "completed",
+                            "failed",
+                            "partial_failed"
+                        ]
+                    },
+                    "metadata": {
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "total_count": {
+                        "type": "integer"
+                    },
+                    "pending_count": {
+                        "type": "integer"
+                    },
+                    "sent_count": {
+                        "type": "integer"
+                    },
+                    "failed_count": {
+                        "type": "integer"
+                    },
+                    "canceled_count": {
+                        "type": "integer"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "ApiResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "data": {
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "error": {
+                        "properties": {
+                            "code": {
+                                "type": "string"
+                            },
+                            "message": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Notifications",
+            "description": "Create, query, and cancel notifications"
+        },
+        {
+            "name": "Batches",
+            "description": "Batch notification creation and status"
+        },
+        {
+            "name": "Observability",
+            "description": "Health and metrics endpoints"
+        }
+    ]
+}

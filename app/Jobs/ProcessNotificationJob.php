@@ -25,7 +25,7 @@ class ProcessNotificationJob implements ShouldQueue
     public function __construct(
         public string $notificationId,
     ) {
-        $this->tries = (int) config('services.notification.max_attempts', 3);
+        $this->tries = (int) config('notification.retry.max_attempts', 3);
     }
 
     public function backoff(): array

@@ -19,8 +19,8 @@ class WebhookSiteProvider implements ProviderInterface
 
     public function send(DeliveryRequest $request): DeliveryResponse
     {
-        $url     = config('services.notification.webhook_url');
-        $timeout = (int) config('services.notification.webhook_timeout', 15);
+        $url     = config('notification.webhook.url');
+        $timeout = (int) config('notification.webhook.timeout', 15);
 
         Log::info('Sending notification via webhook', [
             'provider'        => $this->name(),

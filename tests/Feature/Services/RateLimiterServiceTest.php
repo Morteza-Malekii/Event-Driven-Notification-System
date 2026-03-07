@@ -38,4 +38,31 @@ class RateLimiterServiceTest extends TestCase
     {
         $this->assertEquals(100, app(RateLimiterService::class)->getLimit());
     }
+
+    public function test_blocks_request_after_limit_exceeded(): void
+    {
+        // Set limit to 1 so we only need 2 requests to verify blocking.
+        // The rate limiter uses timestamps (ms) as Redis sorted-set members,
+        // so we sleep 2 ms between calls to ensure unique member keys.
+        config(['notification.rate_limit.per_second' => 1]);
+        $limiter = app(RateLimiterService::class);
+
+        $this->assertTrue($limiter->attempt(NotificationChannel::SMS));
+        usleep(2000);
+        $this->assertFalse($limiter->attempt(NotificationChannel::SMS));
+    }
+
+    public function test_current_count_reflects_attempts(): void
+    {
+        // Sleep 2 ms between attempts so each gets a unique ms-timestamp member.
+        $limiter = app(RateLimiterService::class);
+
+        $limiter->attempt(NotificationChannel::PUSH);
+        usleep(2000);
+        $limiter->attempt(NotificationChannel::PUSH);
+        usleep(2000);
+        $limiter->attempt(NotificationChannel::PUSH);
+
+        $this->assertEquals(3, $limiter->currentCount(NotificationChannel::PUSH));
+    }
 }

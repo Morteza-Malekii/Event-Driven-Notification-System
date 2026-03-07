@@ -3,6 +3,7 @@
 namespace Tests\Feature\Api;
 
 use App\Enums\NotificationChannel;
+use App\Enums\NotificationPriority;
 use App\Events\NotificationCreated;
 use App\Models\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -63,5 +64,60 @@ class NotificationControllerTest extends TestCase
         $this->getJson('/api/notifications?channel=sms')
              ->assertStatus(200)
              ->assertJsonPath('meta.pagination.total', 1);
+    }
+
+    public function test_can_filter_by_status(): void
+    {
+        Notification::factory()->queued()->create();
+        Notification::factory()->sent()->create();
+        Notification::factory()->sent()->create();
+
+        $this->getJson('/api/notifications?status=sent')
+             ->assertStatus(200)
+             ->assertJsonPath('meta.pagination.total', 2);
+    }
+
+    public function test_can_filter_by_priority(): void
+    {
+        Notification::factory()->highPriority()->create();
+        Notification::factory()->create(['priority' => NotificationPriority::LOW]);
+
+        $this->getJson('/api/notifications?priority=high')
+             ->assertStatus(200)
+             ->assertJsonPath('meta.pagination.total', 1);
+    }
+
+    public function test_can_filter_by_date_range(): void
+    {
+        Notification::factory()->create(['created_at' => now()->subDays(10)]);
+        Notification::factory()->create(['created_at' => now()->subDays(3)]);
+        Notification::factory()->create(['created_at' => now()]);
+
+        $from = now()->subDays(5)->toDateString();
+        $to   = now()->toDateString();
+
+        $this->getJson("/api/notifications?from={$from}&to={$to}")
+             ->assertStatus(200)
+             ->assertJsonPath('meta.pagination.total', 2);
+    }
+
+    public function test_list_returns_pagination_meta(): void
+    {
+        Notification::factory()->count(3)->create();
+
+        $this->getJson('/api/notifications?per_page=2')
+             ->assertStatus(200)
+             ->assertJsonStructure(['meta' => ['pagination' => [
+                 'total', 'per_page', 'current_page', 'last_page',
+             ]]]);
+    }
+
+    public function test_show_includes_delivery_attempts(): void
+    {
+        $n = Notification::factory()->create();
+
+        $this->getJson("/api/notifications/{$n->id}")
+             ->assertStatus(200)
+             ->assertJsonStructure(['data' => ['delivery_attempts']]);
     }
 }

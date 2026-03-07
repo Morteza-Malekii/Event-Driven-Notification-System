@@ -76,7 +76,7 @@ class Notification extends Model
 
     // Scopes
 
-    public function scopeOfStatus($query, NotificationStatus $status)
+    public function scopeOfStatus($query, NotificationStatus|string $status)
     {
         return $query->where('status', $status);
     }
@@ -86,7 +86,7 @@ class Notification extends Model
         return $query->where('channel', $channel);
     }
 
-    public function scopeOfPriority($query, NotificationPriority $priority)
+    public function scopeOfPriority($query, NotificationPriority|string $priority)
     {
         return $query->where('priority', $priority);
     }

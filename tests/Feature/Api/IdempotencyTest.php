@@ -15,7 +15,7 @@ class IdempotencyTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Redis::del(['idempotency:idem-001', 'idempotency:idem-002']);
+        Redis::del(['idempotency:idem-001', 'idempotency:idem-002', 'idempotency:conflict-key']);
     }
 
     public function test_same_key_same_payload_returns_same_notification(): void
@@ -42,5 +42,21 @@ class IdempotencyTest extends TestCase
         $this->postJson('/api/notifications', $data);
 
         Event::assertDispatchedTimes(NotificationCreated::class, 1);
+    }
+
+    public function test_same_key_different_payload_returns_409(): void
+    {
+        Event::fake();
+
+        $this->postJson('/api/notifications', [
+            'channel' => 'sms', 'recipient' => '+98', 'content' => 'original',
+            'priority' => 'normal', 'idempotency_key' => 'conflict-key',
+        ])->assertStatus(201);
+
+        $this->postJson('/api/notifications', [
+            'channel' => 'sms', 'recipient' => '+98', 'content' => 'different content',
+            'priority' => 'normal', 'idempotency_key' => 'conflict-key',
+        ])->assertStatus(409)
+          ->assertJsonPath('error.code', 'DUPLICATE_IDEMPOTENCY_KEY');
     }
 }

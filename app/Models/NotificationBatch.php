@@ -13,6 +13,15 @@ class NotificationBatch extends Model
 {
     use HasFactory, HasUuids;
 
+    protected $attributes = [
+        'status'         => 'pending',
+        'total_count'    => 0,
+        'pending_count'  => 0,
+        'sent_count'     => 0,
+        'failed_count'   => 0,
+        'canceled_count' => 0,
+    ];
+
     protected $fillable = [
         'name',
         'status',

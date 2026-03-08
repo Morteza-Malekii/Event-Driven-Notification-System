@@ -4,10 +4,9 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\MetricsController;
 use App\Http\Controllers\NotificationBatchController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Middleware\CorrelationIdMiddleware;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(CorrelationIdMiddleware::class)->group(function () {
+Route::middleware('correlation')->group(function () {
     // Notifications
     Route::get('/notifications',          [NotificationController::class, 'index']);
     Route::post('/notifications',         [NotificationController::class, 'store']);

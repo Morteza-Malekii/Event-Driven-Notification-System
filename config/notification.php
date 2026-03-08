@@ -17,10 +17,4 @@ return [
         ],
     ],
 
-    'queues' => [
-        'high'   => env('NOTIFICATION_QUEUE_HIGH', 'notifications-high'),
-        'normal' => env('NOTIFICATION_QUEUE_NORMAL', 'notifications-normal'),
-        'low'    => env('NOTIFICATION_QUEUE_LOW', 'notifications-low'),
-    ],
-
 ];

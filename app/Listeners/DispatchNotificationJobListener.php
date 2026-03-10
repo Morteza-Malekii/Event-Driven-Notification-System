@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\NotificationCreated;
 use App\Events\NotificationDispatched;
 use App\Jobs\ProcessNotificationJob;
+use Illuminate\Support\Facades\DB;
 
 class DispatchNotificationJobListener
 {
@@ -16,10 +17,13 @@ class DispatchNotificationJobListener
             return;
         }
 
-        $notification->markAsQueued();
+        DB::transaction(function () use ($notification) {
+            $notification->markAsQueued();
 
-        ProcessNotificationJob::dispatch($notification->id)
-            ->onQueue($notification->priority->queueName());
+            ProcessNotificationJob::dispatch($notification->id)
+                ->onQueue($notification->priority->queueName())
+                ->afterCommit();
+        });
 
         event(new NotificationDispatched($notification));
     }

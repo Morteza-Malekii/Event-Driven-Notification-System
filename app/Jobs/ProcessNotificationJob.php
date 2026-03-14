@@ -13,6 +13,7 @@ use App\Models\Notification;
 use App\Services\RateLimiterService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class ProcessNotificationJob implements ShouldQueue
@@ -35,17 +36,21 @@ class ProcessNotificationJob implements ShouldQueue
 
     public function handle(ProviderFactory $providerFactory, RateLimiterService $rateLimiter): void
     {
-        $notification = Notification::lockForUpdate()->find($this->notificationId);
+        $notification = DB::transaction(function () {
+            $notification = Notification::lockForUpdate()->find($this->notificationId);
+
+            if (! $notification || $notification->status->isTerminal()) {
+                return null;
+            }
+
+            $notification->markAsProcessing();
+
+            return $notification;
+        });
 
         if (! $notification) {
             return;
         }
-
-        if ($notification->status->isTerminal()) {
-            return;
-        }
-
-        $notification->markAsProcessing();
 
         if (! $rateLimiter->attempt($notification->channel)) {
             $this->release(10);

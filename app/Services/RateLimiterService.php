@@ -19,8 +19,10 @@ class RateLimiterService
         local count = redis.call('ZCARD', key)
 
         if count < limit then
-            redis.call('ZADD', key, now, now)
+            local seq = redis.call('INCR', key .. ':seq')
+            redis.call('ZADD', key, now, now .. '-' .. seq)
             redis.call('EXPIRE', key, window)
+            redis.call('EXPIRE', key .. ':seq', window)
             return 1
         end
 

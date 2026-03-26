@@ -47,16 +47,6 @@ class RateLimiterService
         return (bool) $result;
     }
 
-    public function currentCount(NotificationChannel $channel): int
-    {
-        $key = $this->key($channel);
-        $now = (int) (microtime(true) * 1000);
-
-        Redis::zremrangebyscore($key, '-inf', $now - self::WINDOW_SECONDS * 1000);
-
-        return (int) Redis::zcard($key);
-    }
-
     public function getLimit(): int
     {
         return (int) config('notification.rate_limit.per_second', 100);

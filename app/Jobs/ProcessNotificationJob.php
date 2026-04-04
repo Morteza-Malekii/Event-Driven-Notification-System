@@ -53,7 +53,8 @@ class ProcessNotificationJob implements ShouldQueue
         }
 
         if (! $rateLimiter->attempt($notification->channel)) {
-            $this->release(10);
+            $notification->markAsQueued();
+            $this->release(2);
             return;
         }
 
@@ -111,6 +112,7 @@ class ProcessNotificationJob implements ShouldQueue
 
         if ($notification) {
             $notification->markAsFailed($e->getMessage());
+            event(new NotificationFailed($notification, $e->getMessage(), true, 0));
         }
     }
 }

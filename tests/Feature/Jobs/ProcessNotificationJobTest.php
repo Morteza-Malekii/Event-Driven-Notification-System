@@ -177,7 +177,7 @@ class ProcessNotificationJobTest extends TestCase
         $this->runJob($notification->id);
     }
 
-    public function test_stays_processing_when_rate_limited(): void
+    public function test_reverts_to_queued_when_rate_limited(): void
     {
         Event::fake();
         Http::fake();
@@ -192,12 +192,14 @@ class ProcessNotificationJobTest extends TestCase
             $rateLimiter,
         );
 
-        $this->assertEquals(NotificationStatus::PROCESSING, $notification->fresh()->status);
+        $this->assertEquals(NotificationStatus::QUEUED, $notification->fresh()->status);
         Http::assertNothingSent();
     }
 
     public function test_failed_hook_marks_notification_as_failed(): void
     {
+        Event::fake([NotificationFailed::class]);
+
         $notification = Notification::factory()->queued()->create();
 
         $job = new ProcessNotificationJob($notification->id);
@@ -205,5 +207,8 @@ class ProcessNotificationJobTest extends TestCase
 
         $this->assertEquals(NotificationStatus::FAILED, $notification->fresh()->status);
         $this->assertNotNull($notification->fresh()->failed_at);
+        Event::assertDispatched(NotificationFailed::class,
+            fn($e) => $e->isPermanent === true && $e->notification->id === $notification->id
+        );
     }
 }

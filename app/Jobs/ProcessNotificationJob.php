@@ -75,6 +75,16 @@ class ProcessNotificationJob implements ShouldQueue
             $response   = $provider->send($request);
             $durationMs = (int) ((microtime(true) - $startTime) * 1000);
 
+            DeliveryAttempt::create([
+                'notification_id'     => $notification->id,
+                'attempt_number'      => $this->attempts(),
+                'status'              => DeliveryAttemptStatus::SUCCESS,
+                'provider'            => $provider->name(),
+                'provider_message_id' => $response->messageId,
+                'duration_ms'         => $durationMs,
+                'attempted_at'        => now(),
+            ]);
+
             $notification->markAsSent($response);
 
             event(new NotificationSent($notification, $response, $durationMs));

@@ -14,6 +14,7 @@ class DispatchNotificationJobListener
         $notification = $event->notification;
 
         if ($notification->scheduled_at && $notification->scheduled_at->isFuture()) {
+            $notification->markAsScheduled();
             return;
         }
 

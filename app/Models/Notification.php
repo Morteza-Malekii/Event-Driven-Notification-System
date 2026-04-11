@@ -99,6 +99,13 @@ class Notification extends Model
 
     // Status helpers
 
+    public function markAsScheduled(): bool
+    {
+        return $this->updateQuietly([
+            'status' => NotificationStatus::SCHEDULED,
+        ]);
+    }
+
     public function markAsQueued(): bool
     {
         return $this->updateQuietly([

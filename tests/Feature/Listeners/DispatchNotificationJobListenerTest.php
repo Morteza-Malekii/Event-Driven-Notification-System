@@ -28,17 +28,18 @@ class DispatchNotificationJobListenerTest extends TestCase
         Queue::assertPushedOn('notifications-high', ProcessNotificationJob::class);
     }
 
-    public function test_does_not_dispatch_for_scheduled_notification(): void
+    public function test_marks_as_scheduled_when_scheduled_at_is_future(): void
     {
         Queue::fake();
         $notification = Notification::factory()->create([
-            'status'       => NotificationStatus::SCHEDULED,
+            'status'       => NotificationStatus::PENDING,
             'scheduled_at' => now()->addHour(),
         ]);
 
         event(new NotificationCreated($notification));
 
         Queue::assertNothingPushed();
+        $this->assertEquals(NotificationStatus::SCHEDULED, $notification->fresh()->status);
     }
 
     public function test_marks_notification_as_queued(): void

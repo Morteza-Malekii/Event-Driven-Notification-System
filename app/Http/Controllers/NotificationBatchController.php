@@ -59,7 +59,9 @@ class NotificationBatchController extends Controller
         CreateBatchNotificationRequest $request,
         CreateBatchAction $action,
     ): JsonResponse {
-        $result = $action->execute($request->validated());
+        $result = $action->execute(array_merge($request->validated(), [
+            'correlation_id' => $request->attributes->get('correlation_id'),
+        ]));
 
         return ApiResponse::success([
             'batch'   => new NotificationBatchResource($result['batch']),

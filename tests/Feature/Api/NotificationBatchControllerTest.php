@@ -97,6 +97,18 @@ class NotificationBatchControllerTest extends TestCase
              ->assertStatus(404);
     }
 
+    public function test_notifications_inherit_correlation_id_from_request(): void
+    {
+        Event::fake();
+        $correlationId = 'test-correlation-id-123';
+
+        $this->withHeaders(['X-Correlation-ID' => $correlationId])
+             ->postJson('/api/batches', $this->validPayload(2))
+             ->assertStatus(201);
+
+        $this->assertDatabaseHas('notifications', ['correlation_id' => $correlationId]);
+    }
+
     public function test_batch_without_name_is_accepted(): void
     {
         Event::fake();

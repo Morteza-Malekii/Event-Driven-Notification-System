@@ -30,7 +30,8 @@ class CreateBatchAction
 
             foreach ($notifications as $index => $notificationData) {
                 try {
-                    $notificationData['batch_id'] = $batch->id;
+                    $notificationData['batch_id']       = $batch->id;
+                    $notificationData['correlation_id'] = $data['correlation_id'] ?? null;
                     $created[] = $this->createNotification->execute($notificationData);
                 } catch (Throwable $e) {
                     $failed[] = $index;

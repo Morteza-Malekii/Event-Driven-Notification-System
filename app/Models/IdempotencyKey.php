@@ -13,6 +13,7 @@ class IdempotencyKey extends Model
         'key',
         'request_hash',
         'notification_id',
+        'batch_id',
         'response_cache',
         'expires_at',
     ];

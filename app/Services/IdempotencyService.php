@@ -59,4 +59,20 @@ class IdempotencyService
             'expires_at'      => now()->addSeconds(self::TTL),
         ]);
     }
+
+    public function storeBatch(string $key, string $hash, string $batchId, array $response): void
+    {
+        $redisKey = self::REDIS_PREFIX . $key;
+        $payload  = json_encode(['hash' => $hash, 'response' => $response]);
+
+        Redis::setex($redisKey, self::TTL, $payload);
+
+        IdempotencyKey::create([
+            'key'          => $key,
+            'request_hash' => $hash,
+            'batch_id'     => $batchId,
+            'response_cache' => $response,
+            'expires_at'   => now()->addSeconds(self::TTL),
+        ]);
+    }
 }

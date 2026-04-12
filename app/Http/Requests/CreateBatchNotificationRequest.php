@@ -10,6 +10,7 @@ class CreateBatchNotificationRequest extends FormRequest
     {
         return [
             'name'                        => ['sometimes', 'nullable', 'string', 'max:255'],
+            'idempotency_key'             => ['sometimes', 'nullable', 'string', 'max:255'],
             'metadata'                    => ['sometimes', 'array'],
             'notifications'               => ['required', 'array', 'min:1', 'max:1000'],
             'notifications.*.channel'     => ['required', 'string', 'in:sms,email,push'],

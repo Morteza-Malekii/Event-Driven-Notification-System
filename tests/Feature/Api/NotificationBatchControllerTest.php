@@ -109,6 +109,32 @@ class NotificationBatchControllerTest extends TestCase
         $this->assertDatabaseHas('notifications', ['correlation_id' => $correlationId]);
     }
 
+    public function test_same_idempotency_key_returns_cached_batch(): void
+    {
+        Event::fake();
+
+        $payload = array_merge($this->validPayload(2), ['idempotency_key' => 'batch-key-123']);
+
+        $first  = $this->postJson('/api/batches', $payload)->assertStatus(201);
+        $second = $this->postJson('/api/batches', $payload)->assertStatus(201);
+
+        $this->assertEquals($first->json('data.batch.id'), $second->json('data.batch.id'));
+        $this->assertDatabaseCount('notifications', 2);
+    }
+
+    public function test_different_payload_with_same_idempotency_key_returns_409(): void
+    {
+        Event::fake();
+
+        $this->postJson('/api/batches', array_merge($this->validPayload(2), [
+            'idempotency_key' => 'batch-key-conflict',
+        ]))->assertStatus(201);
+
+        $this->postJson('/api/batches', array_merge($this->validPayload(3), [
+            'idempotency_key' => 'batch-key-conflict',
+        ]))->assertStatus(409);
+    }
+
     public function test_batch_without_name_is_accepted(): void
     {
         Event::fake();

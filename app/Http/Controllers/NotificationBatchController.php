@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\CreateBatchAction;
+use App\Exceptions\DuplicateIdempotencyKeyException;
 use App\Http\Requests\CreateBatchNotificationRequest;
 use App\Http\Resources\NotificationBatchResource;
 use App\Models\NotificationBatch;
@@ -59,9 +60,13 @@ class NotificationBatchController extends Controller
         CreateBatchNotificationRequest $request,
         CreateBatchAction $action,
     ): JsonResponse {
-        $result = $action->execute(array_merge($request->validated(), [
-            'correlation_id' => $request->attributes->get('correlation_id'),
-        ]));
+        try {
+            $result = $action->execute(array_merge($request->validated(), [
+                'correlation_id' => $request->attributes->get('correlation_id'),
+            ]));
+        } catch (DuplicateIdempotencyKeyException $e) {
+            return ApiResponse::error('DUPLICATE_IDEMPOTENCY_KEY', $e->getMessage(), 409);
+        }
 
         return ApiResponse::success([
             'batch'   => new NotificationBatchResource($result['batch']),

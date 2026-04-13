@@ -28,10 +28,11 @@ class CreateBatchAction
             if ($cached) {
                 $batch = NotificationBatch::find($cached['batch_id']);
                 return [
-                    'batch'   => $batch,
-                    'created' => $cached['created'],
-                    'failed'  => $cached['failed'],
-                    'errors'  => $cached['errors'],
+                    'batch'      => $batch,
+                    'created'    => $cached['created'],
+                    'failed'     => $cached['failed'],
+                    'errors'     => $cached['errors'],
+                    'fromCache'  => true,
                 ];
             }
         }

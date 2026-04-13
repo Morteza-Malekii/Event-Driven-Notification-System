@@ -116,7 +116,7 @@ class NotificationBatchControllerTest extends TestCase
         $payload = array_merge($this->validPayload(2), ['idempotency_key' => 'batch-key-123']);
 
         $first  = $this->postJson('/api/batches', $payload)->assertStatus(201);
-        $second = $this->postJson('/api/batches', $payload)->assertStatus(201);
+        $second = $this->postJson('/api/batches', $payload)->assertStatus(200);
 
         $this->assertEquals($first->json('data.batch.id'), $second->json('data.batch.id'));
         $this->assertDatabaseCount('notifications', 2);

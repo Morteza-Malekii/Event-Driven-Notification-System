@@ -68,12 +68,14 @@ class NotificationBatchController extends Controller
             return ApiResponse::error('DUPLICATE_IDEMPOTENCY_KEY', $e->getMessage(), 409);
         }
 
+        $status = ($result['fromCache'] ?? false) ? 200 : 201;
+
         return ApiResponse::success([
             'batch'   => new NotificationBatchResource($result['batch']),
             'created' => $result['created'],
             'failed'  => $result['failed'],
             'errors'  => $result['errors'],
-        ], 201);
+        ], $status);
     }
 
     /**

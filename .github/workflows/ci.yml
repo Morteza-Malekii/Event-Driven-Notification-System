@@ -55,7 +55,7 @@ jobs:
           sed -i 's/REDIS_HOST=redis/REDIS_HOST=127.0.0.1/' .env.testing
 
       - name: Run tests
-        run: php artisan test --parallel
+        run: php artisan test
 
   lint:
     name: Lint (Pint)

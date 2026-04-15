@@ -5,11 +5,18 @@ namespace Tests\Feature\Api;
 use App\Models\NotificationBatch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Redis;
 use Tests\TestCase;
 
 class NotificationBatchControllerTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Redis::flushdb();
+    }
 
     private function validPayload(int $count = 2): array
     {

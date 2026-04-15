@@ -13,6 +13,12 @@ use Tests\TestCase;
 
 class WebhookSiteProviderTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config(['notification.providers.webhook_site.url' => 'https://webhook.test/uuid']);
+    }
+
     public function test_name_returns_webhook_site(): void
     {
         $this->assertEquals('webhook_site', app(WebhookSiteProvider::class)->name());

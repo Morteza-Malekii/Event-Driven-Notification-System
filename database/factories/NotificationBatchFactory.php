@@ -13,11 +13,11 @@ class NotificationBatchFactory extends Factory
     public function definition(): array
     {
         return [
-            'status'         => BatchStatus::PENDING,
-            'total_count'    => 0,
-            'pending_count'  => 0,
-            'sent_count'     => 0,
-            'failed_count'   => 0,
+            'status' => BatchStatus::PENDING,
+            'total_count' => 0,
+            'pending_count' => 0,
+            'sent_count' => 0,
+            'failed_count' => 0,
             'canceled_count' => 0,
         ];
     }

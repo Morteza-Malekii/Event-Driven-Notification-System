@@ -63,7 +63,7 @@ class RateLimiterServiceTest extends TestCase
         usleep(2000);
         $limiter->attempt(NotificationChannel::PUSH);
 
-        $key = 'rate_limit:channel:' . NotificationChannel::PUSH->value;
+        $key = 'rate_limit:channel:'.NotificationChannel::PUSH->value;
         $now = (int) (microtime(true) * 1000);
         Redis::zremrangebyscore($key, '-inf', $now - 1000);
         $this->assertEquals(3, (int) Redis::zcard($key));

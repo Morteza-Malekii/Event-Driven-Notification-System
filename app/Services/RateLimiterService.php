@@ -31,9 +31,9 @@ class RateLimiterService
 
     public function attempt(NotificationChannel $channel): bool
     {
-        $key    = $this->key($channel);
-        $now    = (int) (microtime(true) * 1000);
-        $limit  = $this->getLimit();
+        $key = $this->key($channel);
+        $now = (int) (microtime(true) * 1000);
+        $limit = $this->getLimit();
 
         $result = Redis::eval(
             $this->luaScript,

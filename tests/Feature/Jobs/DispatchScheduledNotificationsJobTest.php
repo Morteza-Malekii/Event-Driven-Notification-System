@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Jobs;
 
-use App\Events\NotificationCreated;
 use App\Enums\NotificationStatus;
+use App\Events\NotificationCreated;
 use App\Jobs\DispatchScheduledNotificationsJob;
 use App\Models\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -18,11 +18,11 @@ class DispatchScheduledNotificationsJobTest extends TestCase
     {
         Event::fake([NotificationCreated::class]);
         Notification::factory()->create([
-            'status'       => NotificationStatus::SCHEDULED,
+            'status' => NotificationStatus::SCHEDULED,
             'scheduled_at' => now()->subMinute(),
         ]);
 
-        (new DispatchScheduledNotificationsJob())->handle();
+        (new DispatchScheduledNotificationsJob)->handle();
 
         Event::assertDispatched(NotificationCreated::class);
     }
@@ -31,11 +31,11 @@ class DispatchScheduledNotificationsJobTest extends TestCase
     {
         Event::fake([NotificationCreated::class]);
         Notification::factory()->create([
-            'status'       => NotificationStatus::SCHEDULED,
+            'status' => NotificationStatus::SCHEDULED,
             'scheduled_at' => now()->addHour(),
         ]);
 
-        (new DispatchScheduledNotificationsJob())->handle();
+        (new DispatchScheduledNotificationsJob)->handle();
 
         Event::assertNotDispatched(NotificationCreated::class);
     }
@@ -44,11 +44,11 @@ class DispatchScheduledNotificationsJobTest extends TestCase
     {
         Event::fake([NotificationCreated::class]);
         Notification::factory()->create([
-            'status'       => NotificationStatus::PENDING,
+            'status' => NotificationStatus::PENDING,
             'scheduled_at' => now()->subMinute(),
         ]);
 
-        (new DispatchScheduledNotificationsJob())->handle();
+        (new DispatchScheduledNotificationsJob)->handle();
 
         Event::assertNotDispatched(NotificationCreated::class);
     }

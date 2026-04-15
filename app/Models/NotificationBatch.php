@@ -14,11 +14,11 @@ class NotificationBatch extends Model
     use HasFactory, HasUuids;
 
     protected $attributes = [
-        'status'         => 'pending',
-        'total_count'    => 0,
-        'pending_count'  => 0,
-        'sent_count'     => 0,
-        'failed_count'   => 0,
+        'status' => 'pending',
+        'total_count' => 0,
+        'pending_count' => 0,
+        'sent_count' => 0,
+        'failed_count' => 0,
         'canceled_count' => 0,
     ];
 
@@ -34,7 +34,7 @@ class NotificationBatch extends Model
     ];
 
     protected $casts = [
-        'status'   => BatchStatus::class,
+        'status' => BatchStatus::class,
         'metadata' => 'array',
     ];
 
@@ -68,20 +68,15 @@ class NotificationBatch extends Model
         $this->refresh();
 
         $status = match (true) {
-            $this->total_count === 0
-                => BatchStatus::PENDING,
+            $this->total_count === 0 => BatchStatus::PENDING,
 
-            $this->pending_count === 0 && $this->failed_count === 0 && $this->canceled_count === 0
-                => BatchStatus::COMPLETED,
+            $this->pending_count === 0 && $this->failed_count === 0 && $this->canceled_count === 0 => BatchStatus::COMPLETED,
 
-            $this->pending_count === 0 && $this->sent_count > 0 && $this->failed_count > 0
-                => BatchStatus::PARTIAL_FAILED,
+            $this->pending_count === 0 && $this->sent_count > 0 && $this->failed_count > 0 => BatchStatus::PARTIAL_FAILED,
 
-            $this->pending_count === 0 && $this->sent_count === 0
-                => BatchStatus::FAILED,
+            $this->pending_count === 0 && $this->sent_count === 0 => BatchStatus::FAILED,
 
-            $this->pending_count > 0
-                => BatchStatus::PROCESSING,
+            $this->pending_count > 0 => BatchStatus::PROCESSING,
 
             default => BatchStatus::PROCESSING,
         };

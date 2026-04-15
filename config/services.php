@@ -36,10 +36,10 @@ return [
     ],
 
     'notification' => [
-        'webhook_url'     => env('NOTIFICATION_WEBHOOK_URL'),
+        'webhook_url' => env('NOTIFICATION_WEBHOOK_URL'),
         'webhook_timeout' => env('NOTIFICATION_WEBHOOK_TIMEOUT', 15),
-        'max_attempts'    => env('NOTIFICATION_MAX_ATTEMPTS', 3),
-        'rate_limit'      => env('NOTIFICATION_RATE_LIMIT', 100),
+        'max_attempts' => env('NOTIFICATION_MAX_ATTEMPTS', 3),
+        'rate_limit' => env('NOTIFICATION_RATE_LIMIT', 100),
     ],
 
 ];

@@ -44,7 +44,7 @@ class CreateNotificationActionTest extends TestCase
         ]);
 
         Event::assertDispatched(NotificationCreated::class,
-            fn($e) => $e->notification->id === $n->id
+            fn ($e) => $e->notification->id === $n->id
         );
     }
 
@@ -52,7 +52,7 @@ class CreateNotificationActionTest extends TestCase
     {
         Event::fake([NotificationCreated::class]);
         $data = ['channel' => 'sms', 'recipient' => '+98', 'content' => 'test',
-                 'priority' => 'normal', 'idempotency_key' => 'idem-001', 'correlation_id' => 'c1'];
+            'priority' => 'normal', 'idempotency_key' => 'idem-001', 'correlation_id' => 'c1'];
 
         app(CreateNotificationAction::class)->execute($data);
         app(CreateNotificationAction::class)->execute($data); // replay
@@ -64,7 +64,7 @@ class CreateNotificationActionTest extends TestCase
     {
         Event::fake();
         $data = ['channel' => 'sms', 'recipient' => '+98', 'content' => 'test',
-                 'priority' => 'normal', 'idempotency_key' => 'idem-002', 'correlation_id' => 'c1'];
+            'priority' => 'normal', 'idempotency_key' => 'idem-002', 'correlation_id' => 'c1'];
 
         $n1 = app(CreateNotificationAction::class)->execute($data);
         $n2 = app(CreateNotificationAction::class)->execute($data);

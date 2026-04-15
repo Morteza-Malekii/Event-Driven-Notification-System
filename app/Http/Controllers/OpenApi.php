@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
  *     title="Notification System API",
  *     version="1.0.0",
  *     description="Event-driven notification system supporting SMS, Email, and Push channels with priority queues, rate limiting, retry logic, and idempotency.",
+ *
  *     @OA\Contact(email="admin@example.com")
  * )
  *
@@ -22,6 +23,7 @@ namespace App\Http\Controllers;
  * @OA\Schema(
  *     schema="NotificationResource",
  *     type="object",
+ *
  *     @OA\Property(property="id",                  type="string", format="uuid"),
  *     @OA\Property(property="batch_id",             type="string", format="uuid", nullable=true),
  *     @OA\Property(property="channel",              type="string", enum={"sms","email","push"}),
@@ -45,6 +47,7 @@ namespace App\Http\Controllers;
  *     @OA\Property(
  *         property="delivery_attempts",
  *         type="array",
+ *
  *         @OA\Items(ref="#/components/schemas/DeliveryAttemptResource")
  *     )
  * )
@@ -52,6 +55,7 @@ namespace App\Http\Controllers;
  * @OA\Schema(
  *     schema="DeliveryAttemptResource",
  *     type="object",
+ *
  *     @OA\Property(property="id",                   type="string", format="uuid"),
  *     @OA\Property(property="attempt_number",        type="integer"),
  *     @OA\Property(property="status",                type="string", enum={"success","failed","rate_limited"}),
@@ -66,6 +70,7 @@ namespace App\Http\Controllers;
  * @OA\Schema(
  *     schema="NotificationBatchResource",
  *     type="object",
+ *
  *     @OA\Property(property="id",             type="string", format="uuid"),
  *     @OA\Property(property="name",           type="string", nullable=true),
  *     @OA\Property(property="status",         type="string", enum={"pending","processing","completed","failed","partial_failed"}),
@@ -82,6 +87,7 @@ namespace App\Http\Controllers;
  * @OA\Schema(
  *     schema="ApiResponse",
  *     type="object",
+ *
  *     @OA\Property(property="success", type="boolean"),
  *     @OA\Property(property="data",    type="object")
  * )
@@ -89,6 +95,7 @@ namespace App\Http\Controllers;
  * @OA\Schema(
  *     schema="ErrorResponse",
  *     type="object",
+ *
  *     @OA\Property(property="success", type="boolean", example=false),
  *     @OA\Property(property="error",   type="object",
  *         @OA\Property(property="code",    type="string"),

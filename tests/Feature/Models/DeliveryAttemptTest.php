@@ -29,9 +29,9 @@ class DeliveryAttemptTest extends TestCase
 
         $attempt = DeliveryAttempt::create([
             'notification_id' => $notification->id,
-            'attempt_number'  => 1,
-            'status'          => DeliveryAttemptStatus::SUCCESS,
-            'attempted_at'    => now(),
+            'attempt_number' => 1,
+            'status' => DeliveryAttemptStatus::SUCCESS,
+            'attempted_at' => now(),
         ]);
 
         $this->assertTrue($attempt->notification->is($notification));
@@ -43,16 +43,16 @@ class DeliveryAttemptTest extends TestCase
 
         DeliveryAttempt::create([
             'notification_id' => $notification->id,
-            'attempt_number'  => 1,
-            'status'          => DeliveryAttemptStatus::FAILED,
-            'attempted_at'    => now(),
+            'attempt_number' => 1,
+            'status' => DeliveryAttemptStatus::FAILED,
+            'attempted_at' => now(),
         ]);
 
         DeliveryAttempt::create([
             'notification_id' => $notification->id,
-            'attempt_number'  => 2,
-            'status'          => DeliveryAttemptStatus::SUCCESS,
-            'attempted_at'    => now(),
+            'attempt_number' => 2,
+            'status' => DeliveryAttemptStatus::SUCCESS,
+            'attempted_at' => now(),
         ]);
 
         $this->assertCount(2, $notification->deliveryAttempts);

@@ -21,10 +21,13 @@ class NotificationController extends Controller
      *     tags={"Notifications"},
      *     summary="Create a notification",
      *     description="Creates a single notification and dispatches it to the queue. Supports idempotency via idempotency_key field.",
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"channel","recipient","content"},
+     *
      *             @OA\Property(property="channel",         type="string", enum={"sms","email","push"}, example="sms"),
      *             @OA\Property(property="recipient",       type="string", example="+905551234567"),
      *             @OA\Property(property="content",         type="string", example="Your OTP is 1234"),
@@ -35,19 +38,25 @@ class NotificationController extends Controller
      *             @OA\Property(property="max_attempts",    type="integer", example=3)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Notification created",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="data", ref="#/components/schemas/NotificationResource")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Idempotency replay — returning existing notification",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/ApiResponse")
      *     ),
+     *
      *     @OA\Response(response=409, description="Idempotency key conflict", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=422, description="Validation error")
      * )
@@ -59,7 +68,7 @@ class NotificationController extends Controller
         try {
             $data = array_filter(array_merge($request->validated(), [
                 'correlation_id' => $request->attributes->get('correlation_id'),
-            ]), fn($v) => $v !== null);
+            ]), fn ($v) => $v !== null);
 
             $notification = $action->execute($data);
 
@@ -77,15 +86,20 @@ class NotificationController extends Controller
      *     tags={"Notifications"},
      *     summary="Get a notification",
      *     description="Returns a notification by UUID including all delivery attempts.",
+     *
      *     @OA\Parameter(name="id", in="path", required=true, description="Notification UUID", @OA\Schema(type="string", format="uuid")),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Notification found",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="data", ref="#/components/schemas/NotificationResource")
      *         )
      *     ),
+     *
      *     @OA\Response(response=404, description="Not found")
      * )
      */
@@ -102,16 +116,20 @@ class NotificationController extends Controller
      *     tags={"Notifications"},
      *     summary="List notifications",
      *     description="Returns a paginated list of notifications with optional filters.",
+     *
      *     @OA\Parameter(name="status",   in="query", @OA\Schema(type="string", enum={"pending","scheduled","queued","processing","sent","failed","canceled"})),
      *     @OA\Parameter(name="channel",  in="query", @OA\Schema(type="string", enum={"sms","email","push"})),
      *     @OA\Parameter(name="priority", in="query", @OA\Schema(type="string", enum={"high","normal","low"})),
      *     @OA\Parameter(name="from",     in="query", description="Start date (Y-m-d)", @OA\Schema(type="string", format="date")),
      *     @OA\Parameter(name="to",       in="query", description="End date (Y-m-d)",   @OA\Schema(type="string", format="date")),
      *     @OA\Parameter(name="per_page", in="query", @OA\Schema(type="integer", default=20)),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Paginated list",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/NotificationResource")),
      *             @OA\Property(property="meta", type="object",
@@ -151,10 +169,10 @@ class NotificationController extends Controller
             NotificationResource::collection($paginator->items()),
             200,
             [
-                'total'        => $paginator->total(),
-                'per_page'     => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'per_page' => $paginator->perPage(),
                 'current_page' => $paginator->currentPage(),
-                'last_page'    => $paginator->lastPage(),
+                'last_page' => $paginator->lastPage(),
             ],
         );
     }
@@ -165,15 +183,20 @@ class NotificationController extends Controller
      *     tags={"Notifications"},
      *     summary="Cancel a notification",
      *     description="Cancels a pending or queued notification. Sent or failed notifications cannot be canceled.",
+     *
      *     @OA\Parameter(name="id", in="path", required=true, description="Notification UUID", @OA\Schema(type="string", format="uuid")),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Notification canceled",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="data", ref="#/components/schemas/NotificationResource")
      *         )
      *     ),
+     *
      *     @OA\Response(response=409, description="Cannot cancel in current state", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=404, description="Not found")
      * )

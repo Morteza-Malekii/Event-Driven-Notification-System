@@ -12,7 +12,7 @@ return [
 
     'providers' => [
         'webhook_site' => [
-            'url'     => env('NOTIFICATION_WEBHOOK_URL'),
+            'url' => env('NOTIFICATION_WEBHOOK_URL'),
             'timeout' => env('NOTIFICATION_WEBHOOK_TIMEOUT', 15),
         ],
     ],

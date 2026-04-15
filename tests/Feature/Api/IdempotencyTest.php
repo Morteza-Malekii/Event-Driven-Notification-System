@@ -22,7 +22,7 @@ class IdempotencyTest extends TestCase
     {
         Event::fake();
         $data = ['channel' => 'sms', 'recipient' => '+98', 'content' => 'test',
-                 'priority' => 'normal', 'idempotency_key' => 'idem-001'];
+            'priority' => 'normal', 'idempotency_key' => 'idem-001'];
 
         $r1 = $this->postJson('/api/notifications', $data);
         $r2 = $this->postJson('/api/notifications', $data);
@@ -36,7 +36,7 @@ class IdempotencyTest extends TestCase
     {
         Event::fake([NotificationCreated::class]);
         $data = ['channel' => 'sms', 'recipient' => '+98', 'content' => 'test',
-                 'priority' => 'normal', 'idempotency_key' => 'idem-002'];
+            'priority' => 'normal', 'idempotency_key' => 'idem-002'];
 
         $this->postJson('/api/notifications', $data);
         $this->postJson('/api/notifications', $data);
@@ -57,6 +57,6 @@ class IdempotencyTest extends TestCase
             'channel' => 'sms', 'recipient' => '+98', 'content' => 'different content',
             'priority' => 'normal', 'idempotency_key' => 'conflict-key',
         ])->assertStatus(409)
-          ->assertJsonPath('error.code', 'DUPLICATE_IDEMPOTENCY_KEY');
+            ->assertJsonPath('error.code', 'DUPLICATE_IDEMPOTENCY_KEY');
     }
 }

@@ -15,7 +15,7 @@ enum NotificationStatus: string
 
     public function isTerminal(): bool
     {
-        return match($this) {
+        return match ($this) {
             self::SENT, self::DELIVERED, self::FAILED, self::CANCELED => true,
             default => false,
         };
@@ -23,7 +23,7 @@ enum NotificationStatus: string
 
     public function isCancelable(): bool
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING, self::SCHEDULED, self::QUEUED => true,
             default => false,
         };

@@ -17,10 +17,13 @@ class HealthController extends Controller
      *     tags={"Observability"},
      *     summary="Health check",
      *     description="Returns the health status of database, Redis, and cache services.",
+     *
      *     @OA\Response(
      *         response=200,
      *         description="All services healthy",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="data", type="object",
      *                 @OA\Property(property="status", type="string", enum={"healthy","degraded"}),
@@ -32,6 +35,7 @@ class HealthController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(response=503, description="One or more services degraded")
      * )
      */
@@ -39,14 +43,14 @@ class HealthController extends Controller
     {
         $services = [
             'database' => $this->checkDatabase(),
-            'redis'    => $this->checkRedis(),
-            'cache'    => $this->checkCache(),
+            'redis' => $this->checkRedis(),
+            'cache' => $this->checkCache(),
         ];
 
-        $healthy = collect($services)->every(fn($c) => $c['status'] === 'ok');
+        $healthy = collect($services)->every(fn ($c) => $c['status'] === 'ok');
 
         return ApiResponse::success([
-            'status'   => $healthy ? 'healthy' : 'degraded',
+            'status' => $healthy ? 'healthy' : 'degraded',
             'services' => $services,
         ], $healthy ? 200 : 503);
     }
@@ -55,6 +59,7 @@ class HealthController extends Controller
     {
         try {
             DB::selectOne('SELECT 1');
+
             return ['status' => 'ok'];
         } catch (Throwable $e) {
             return ['status' => 'error', 'message' => $e->getMessage()];
@@ -65,6 +70,7 @@ class HealthController extends Controller
     {
         try {
             Redis::ping();
+
             return ['status' => 'ok'];
         } catch (Throwable $e) {
             return ['status' => 'error', 'message' => $e->getMessage()];
@@ -76,6 +82,7 @@ class HealthController extends Controller
         try {
             Cache::put('health_check', true, 5);
             Cache::get('health_check');
+
             return ['status' => 'ok'];
         } catch (Throwable $e) {
             return ['status' => 'error', 'message' => $e->getMessage()];

@@ -6,20 +6,20 @@ use App\DTOs\DeliveryResponse;
 use App\Enums\NotificationChannel;
 use App\Enums\NotificationPriority;
 use App\Enums\NotificationStatus;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Notification extends Model
 {
     use HasFactory, HasUuids;
 
     protected $attributes = [
-        'status'        => 'pending',
-        'priority'      => 'normal',
-        'max_attempts'  => 3,
+        'status' => 'pending',
+        'priority' => 'normal',
+        'max_attempts' => 3,
         'attempt_count' => 0,
     ];
 
@@ -48,17 +48,17 @@ class Notification extends Model
     ];
 
     protected $casts = [
-        'status'           => NotificationStatus::class,
-        'channel'          => NotificationChannel::class,
-        'priority'         => NotificationPriority::class,
-        'metadata'         => 'array',
-        'scheduled_at'     => 'datetime',
-        'queued_at'        => 'datetime',
-        'processing_at'    => 'datetime',
-        'sent_at'          => 'datetime',
-        'delivered_at'     => 'datetime',
-        'failed_at'        => 'datetime',
-        'canceled_at'      => 'datetime',
+        'status' => NotificationStatus::class,
+        'channel' => NotificationChannel::class,
+        'priority' => NotificationPriority::class,
+        'metadata' => 'array',
+        'scheduled_at' => 'datetime',
+        'queued_at' => 'datetime',
+        'processing_at' => 'datetime',
+        'sent_at' => 'datetime',
+        'delivered_at' => 'datetime',
+        'failed_at' => 'datetime',
+        'canceled_at' => 'datetime',
         'last_attempted_at' => 'datetime',
     ];
 
@@ -94,7 +94,7 @@ class Notification extends Model
     public function scopeCreatedBetween($query, string $from, string $to)
     {
         return $query->whereDate('created_at', '>=', $from)
-                     ->whereDate('created_at', '<=', $to);
+            ->whereDate('created_at', '<=', $to);
     }
 
     // Status helpers
@@ -109,7 +109,7 @@ class Notification extends Model
     public function markAsQueued(): bool
     {
         return $this->updateQuietly([
-            'status'    => NotificationStatus::QUEUED,
+            'status' => NotificationStatus::QUEUED,
             'queued_at' => now(),
         ]);
     }
@@ -117,7 +117,7 @@ class Notification extends Model
     public function markAsProcessing(): bool
     {
         return $this->updateQuietly([
-            'status'        => NotificationStatus::PROCESSING,
+            'status' => NotificationStatus::PROCESSING,
             'processing_at' => now(),
         ]);
     }
@@ -125,19 +125,19 @@ class Notification extends Model
     public function markAsSent(DeliveryResponse $response): bool
     {
         return $this->updateQuietly([
-            'status'              => NotificationStatus::SENT,
-            'sent_at'             => now(),
+            'status' => NotificationStatus::SENT,
+            'sent_at' => now(),
             'provider_message_id' => $response->messageId,
-            'last_attempted_at'   => now(),
+            'last_attempted_at' => now(),
         ]);
     }
 
     public function markAsFailed(string $errorMessage): bool
     {
         return $this->updateQuietly([
-            'status'            => NotificationStatus::FAILED,
-            'failed_at'         => now(),
-            'error_message'     => $errorMessage,
+            'status' => NotificationStatus::FAILED,
+            'failed_at' => now(),
+            'error_message' => $errorMessage,
             'last_attempted_at' => now(),
         ]);
     }
@@ -145,7 +145,7 @@ class Notification extends Model
     public function markAsCanceled(): bool
     {
         return $this->updateQuietly([
-            'status'      => NotificationStatus::CANCELED,
+            'status' => NotificationStatus::CANCELED,
             'canceled_at' => now(),
         ]);
     }

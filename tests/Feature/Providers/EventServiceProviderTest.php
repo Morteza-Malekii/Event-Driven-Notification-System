@@ -19,7 +19,7 @@ class EventServiceProviderTest extends TestCase
         $listen = app()->getProvider(EventServiceProvider::class)->listens();
         $listeners = $listen[$event] ?? [];
 
-        return array_map(fn($l) => is_array($l) ? $l[0] : $l, $listeners);
+        return array_map(fn ($l) => is_array($l) ? $l[0] : $l, $listeners);
     }
 
     public function test_notification_created_has_dispatch_listener(): void

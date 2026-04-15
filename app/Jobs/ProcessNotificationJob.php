@@ -21,6 +21,7 @@ class ProcessNotificationJob implements ShouldQueue
     use Queueable;
 
     public int $tries;
+
     public int $timeout = 30;
 
     public function __construct(
@@ -55,6 +56,7 @@ class ProcessNotificationJob implements ShouldQueue
         if (! $rateLimiter->attempt($notification->channel)) {
             $notification->markAsQueued();
             $this->release(2);
+
             return;
         }
 
@@ -62,27 +64,27 @@ class ProcessNotificationJob implements ShouldQueue
 
         $request = new DeliveryRequest(
             notificationId: $notification->id,
-            channel:        $notification->channel,
-            recipient:      $notification->recipient,
-            content:        $notification->content,
-            metadata:       $notification->metadata ?? [],
-            priority:       $notification->priority,
+            channel: $notification->channel,
+            recipient: $notification->recipient,
+            content: $notification->content,
+            metadata: $notification->metadata ?? [],
+            priority: $notification->priority,
         );
 
         $provider = $providerFactory->make($notification->channel);
 
         try {
-            $response   = $provider->send($request);
+            $response = $provider->send($request);
             $durationMs = (int) ((microtime(true) - $startTime) * 1000);
 
             DeliveryAttempt::create([
-                'notification_id'     => $notification->id,
-                'attempt_number'      => $this->attempts(),
-                'status'              => DeliveryAttemptStatus::SUCCESS,
-                'provider'            => $provider->name(),
+                'notification_id' => $notification->id,
+                'attempt_number' => $this->attempts(),
+                'status' => DeliveryAttemptStatus::SUCCESS,
+                'provider' => $provider->name(),
                 'provider_message_id' => $response->messageId,
-                'duration_ms'         => $durationMs,
-                'attempted_at'        => now(),
+                'duration_ms' => $durationMs,
+                'attempted_at' => now(),
             ]);
 
             $notification->markAsSent($response);
@@ -93,21 +95,22 @@ class ProcessNotificationJob implements ShouldQueue
             $durationMs = (int) ((microtime(true) - $startTime) * 1000);
 
             DeliveryAttempt::create([
-                'notification_id'      => $notification->id,
-                'attempt_number'       => $this->attempts(),
-                'status'               => $e->isPermanent
+                'notification_id' => $notification->id,
+                'attempt_number' => $this->attempts(),
+                'status' => $e->isPermanent
                     ? DeliveryAttemptStatus::FAILED
                     : DeliveryAttemptStatus::RATE_LIMITED,
-                'provider'             => $provider->name(),
-                'error_message'        => $e->getMessage(),
+                'provider' => $provider->name(),
+                'error_message' => $e->getMessage(),
                 'is_transient_failure' => ! $e->isPermanent,
-                'duration_ms'          => $durationMs,
-                'attempted_at'         => now(),
+                'duration_ms' => $durationMs,
+                'attempted_at' => now(),
             ]);
 
             if ($e->isPermanent) {
                 $notification->markAsFailed($e->getMessage());
                 event(new NotificationFailed($notification, $e->getMessage(), true, $durationMs));
+
                 return;
             }
 

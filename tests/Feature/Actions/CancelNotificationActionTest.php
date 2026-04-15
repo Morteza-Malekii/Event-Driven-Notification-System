@@ -34,7 +34,7 @@ class CancelNotificationActionTest extends TestCase
         app(CancelNotificationAction::class)->execute($n->id);
 
         Event::assertDispatched(NotificationCanceled::class,
-            fn($e) => $e->notification->id === $n->id
+            fn ($e) => $e->notification->id === $n->id
         );
     }
 
@@ -54,7 +54,8 @@ class CancelNotificationActionTest extends TestCase
 
         try {
             app(CancelNotificationAction::class)->execute($n->id);
-        } catch (CancellationNotAllowedException) {}
+        } catch (CancellationNotAllowedException) {
+        }
 
         Event::assertNotDispatched(NotificationCanceled::class);
     }

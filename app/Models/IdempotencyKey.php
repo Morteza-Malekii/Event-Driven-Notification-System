@@ -20,6 +20,6 @@ class IdempotencyKey extends Model
 
     protected $casts = [
         'response_cache' => 'array',
-        'expires_at'     => 'datetime',
+        'expires_at' => 'datetime',
     ];
 }

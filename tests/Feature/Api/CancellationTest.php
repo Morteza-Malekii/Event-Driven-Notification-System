@@ -19,8 +19,8 @@ class CancellationTest extends TestCase
         $n = Notification::factory()->create(['status' => NotificationStatus::QUEUED]);
 
         $this->postJson("/api/notifications/{$n->id}/cancel")
-             ->assertStatus(200)
-             ->assertJsonPath('data.status', 'canceled');
+            ->assertStatus(200)
+            ->assertJsonPath('data.status', 'canceled');
     }
 
     public function test_fires_canceled_event_on_cancel(): void
@@ -39,7 +39,7 @@ class CancellationTest extends TestCase
         $n = Notification::factory()->sent()->create();
 
         $this->postJson("/api/notifications/{$n->id}/cancel")
-             ->assertStatus(409)
-             ->assertJsonPath('error.code', 'CANCELLATION_NOT_ALLOWED');
+            ->assertStatus(409)
+            ->assertJsonPath('error.code', 'CANCELLATION_NOT_ALLOWED');
     }
 }

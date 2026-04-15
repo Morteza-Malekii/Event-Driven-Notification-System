@@ -12,8 +12,8 @@ class NotificationFailed
 
     public function __construct(
         public readonly Notification $notification,
-        public readonly string       $errorMessage,
-        public readonly bool         $isPermanent,
-        public readonly int          $durationMs,
+        public readonly string $errorMessage,
+        public readonly bool $isPermanent,
+        public readonly int $durationMs,
     ) {}
 }

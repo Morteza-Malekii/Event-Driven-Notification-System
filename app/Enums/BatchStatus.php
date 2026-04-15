@@ -13,7 +13,7 @@ enum BatchStatus: string
 
     public function isTerminal(): bool
     {
-        return match($this) {
+        return match ($this) {
             self::COMPLETED, self::PARTIAL_FAILED, self::FAILED, self::CANCELED => true,
             default => false,
         };

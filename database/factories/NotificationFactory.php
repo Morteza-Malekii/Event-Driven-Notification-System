@@ -15,12 +15,12 @@ class NotificationFactory extends Factory
     public function definition(): array
     {
         return [
-            'channel'   => NotificationChannel::EMAIL,
-            'priority'  => NotificationPriority::NORMAL,
-            'status'    => NotificationStatus::PENDING,
+            'channel' => NotificationChannel::EMAIL,
+            'priority' => NotificationPriority::NORMAL,
+            'status' => NotificationStatus::PENDING,
             'recipient' => fake()->email(),
-            'content'   => fake()->sentence(),
-            'metadata'  => null,
+            'content' => fake()->sentence(),
+            'metadata' => null,
             'max_attempts' => 3,
             'attempt_count' => 0,
         ];
@@ -29,7 +29,7 @@ class NotificationFactory extends Factory
     public function sms(): static
     {
         return $this->state([
-            'channel'   => NotificationChannel::SMS,
+            'channel' => NotificationChannel::SMS,
             'recipient' => fake()->phoneNumber(),
         ]);
     }
@@ -37,7 +37,7 @@ class NotificationFactory extends Factory
     public function email(): static
     {
         return $this->state([
-            'channel'   => NotificationChannel::EMAIL,
+            'channel' => NotificationChannel::EMAIL,
             'recipient' => fake()->email(),
         ]);
     }
@@ -45,7 +45,7 @@ class NotificationFactory extends Factory
     public function push(): static
     {
         return $this->state([
-            'channel'   => NotificationChannel::PUSH,
+            'channel' => NotificationChannel::PUSH,
             'recipient' => fake()->uuid(),
         ]);
     }
@@ -60,7 +60,7 @@ class NotificationFactory extends Factory
     public function queued(): static
     {
         return $this->state([
-            'status'    => NotificationStatus::QUEUED,
+            'status' => NotificationStatus::QUEUED,
             'queued_at' => now(),
         ]);
     }
@@ -68,7 +68,7 @@ class NotificationFactory extends Factory
     public function sent(): static
     {
         return $this->state([
-            'status'  => NotificationStatus::SENT,
+            'status' => NotificationStatus::SENT,
             'sent_at' => now(),
         ]);
     }
@@ -76,8 +76,8 @@ class NotificationFactory extends Factory
     public function failed(): static
     {
         return $this->state([
-            'status'        => NotificationStatus::FAILED,
-            'failed_at'     => now(),
+            'status' => NotificationStatus::FAILED,
+            'failed_at' => now(),
             'error_message' => fake()->sentence(),
         ]);
     }

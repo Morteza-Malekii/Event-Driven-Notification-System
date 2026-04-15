@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Redis;
 class IdempotencyService
 {
     private const TTL = 86400;
+
     private const REDIS_PREFIX = 'idempotency:';
 
     public function hashRequest(array $data): string
@@ -18,8 +19,8 @@ class IdempotencyService
 
     public function check(string $key, string $hash): ?array
     {
-        $redisKey = self::REDIS_PREFIX . $key;
-        $cached   = Redis::get($redisKey);
+        $redisKey = self::REDIS_PREFIX.$key;
+        $cached = Redis::get($redisKey);
 
         if ($cached !== null) {
             $data = json_decode($cached, true);
@@ -46,33 +47,33 @@ class IdempotencyService
 
     public function store(string $key, string $hash, string $notificationId, array $response): void
     {
-        $redisKey = self::REDIS_PREFIX . $key;
-        $payload  = json_encode(['hash' => $hash, 'response' => $response]);
+        $redisKey = self::REDIS_PREFIX.$key;
+        $payload = json_encode(['hash' => $hash, 'response' => $response]);
 
         Redis::setex($redisKey, self::TTL, $payload);
 
         IdempotencyKey::create([
-            'key'             => $key,
-            'request_hash'    => $hash,
+            'key' => $key,
+            'request_hash' => $hash,
             'notification_id' => $notificationId,
-            'response_cache'  => $response,
-            'expires_at'      => now()->addSeconds(self::TTL),
+            'response_cache' => $response,
+            'expires_at' => now()->addSeconds(self::TTL),
         ]);
     }
 
     public function storeBatch(string $key, string $hash, string $batchId, array $response): void
     {
-        $redisKey = self::REDIS_PREFIX . $key;
-        $payload  = json_encode(['hash' => $hash, 'response' => $response]);
+        $redisKey = self::REDIS_PREFIX.$key;
+        $payload = json_encode(['hash' => $hash, 'response' => $response]);
 
         Redis::setex($redisKey, self::TTL, $payload);
 
         IdempotencyKey::create([
-            'key'          => $key,
+            'key' => $key,
             'request_hash' => $hash,
-            'batch_id'     => $batchId,
+            'batch_id' => $batchId,
             'response_cache' => $response,
-            'expires_at'   => now()->addSeconds(self::TTL),
+            'expires_at' => now()->addSeconds(self::TTL),
         ]);
     }
 }

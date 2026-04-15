@@ -76,7 +76,7 @@ class NotificationTest extends TestCase
     public function test_has_exceeded_max_attempts_returns_true(): void
     {
         $notification = Notification::factory()->create([
-            'max_attempts'  => 3,
+            'max_attempts' => 3,
             'attempt_count' => 3,
         ]);
 
@@ -86,7 +86,7 @@ class NotificationTest extends TestCase
     public function test_has_exceeded_max_attempts_returns_false(): void
     {
         $notification = Notification::factory()->create([
-            'max_attempts'  => 3,
+            'max_attempts' => 3,
             'attempt_count' => 1,
         ]);
 

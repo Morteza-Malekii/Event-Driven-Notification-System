@@ -9,6 +9,6 @@ final readonly class DeliveryResponse
         public string $status,
         public string $timestamp,
         public string $provider,
-        public array  $rawResponse = [],
+        public array $rawResponse = [],
     ) {}
 }

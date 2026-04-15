@@ -19,7 +19,7 @@ class DispatchNotificationJobListenerTest extends TestCase
     {
         Queue::fake();
         $notification = Notification::factory()->create([
-            'status'   => NotificationStatus::PENDING,
+            'status' => NotificationStatus::PENDING,
             'priority' => NotificationPriority::HIGH,
         ]);
 
@@ -32,7 +32,7 @@ class DispatchNotificationJobListenerTest extends TestCase
     {
         Queue::fake();
         $notification = Notification::factory()->create([
-            'status'       => NotificationStatus::PENDING,
+            'status' => NotificationStatus::PENDING,
             'scheduled_at' => now()->addHour(),
         ]);
 

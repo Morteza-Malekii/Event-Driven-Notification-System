@@ -21,7 +21,7 @@ class ApiResponse
     {
         $payload = [
             'error' => [
-                'code'    => $code,
+                'code' => $code,
                 'message' => $message,
             ],
         ];

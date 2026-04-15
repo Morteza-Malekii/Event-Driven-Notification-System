@@ -15,13 +15,13 @@ class CreateNotificationAction
 
     public function execute(array $data): Notification
     {
-        $key  = $data['idempotency_key'] ?? null;
+        $key = $data['idempotency_key'] ?? null;
         $hash = null;
 
         if ($key) {
             $hashData = array_diff_key($data, array_flip(['idempotency_key', 'correlation_id', 'batch_id']));
-            $hash     = $this->idempotency->hashRequest($hashData);
-            $cached   = $this->idempotency->check($key, $hash);
+            $hash = $this->idempotency->hashRequest($hashData);
+            $cached = $this->idempotency->check($key, $hash);
 
             if ($cached) {
                 return Notification::find($cached['notification_id']);

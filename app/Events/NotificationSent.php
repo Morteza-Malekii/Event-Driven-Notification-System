@@ -12,8 +12,8 @@ class NotificationSent
     use Dispatchable, SerializesModels;
 
     public function __construct(
-        public readonly Notification     $notification,
+        public readonly Notification $notification,
         public readonly DeliveryResponse $response,
-        public readonly int              $durationMs,
+        public readonly int $durationMs,
     ) {}
 }

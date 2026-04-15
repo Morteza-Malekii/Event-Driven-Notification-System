@@ -8,7 +8,6 @@ use App\Events\NotificationFailed;
 use App\Events\NotificationSent;
 use App\Exceptions\ProviderDeliveryException;
 use App\Jobs\ProcessNotificationJob;
-use App\Models\DeliveryAttempt;
 use App\Models\Notification;
 use App\Services\RateLimiterService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -87,7 +86,7 @@ class ProcessNotificationJobTest extends TestCase
         $this->runJob($notification->id);
 
         Event::assertDispatched(NotificationSent::class,
-            fn($e) => $e->notification->id === $notification->id
+            fn ($e) => $e->notification->id === $notification->id
         );
     }
 
@@ -114,7 +113,7 @@ class ProcessNotificationJobTest extends TestCase
         $this->runJob($notification->id);
 
         Event::assertDispatched(NotificationFailed::class,
-            fn($e) => $e->isPermanent === true && $e->notification->id === $notification->id
+            fn ($e) => $e->isPermanent === true && $e->notification->id === $notification->id
         );
     }
 
@@ -128,7 +127,7 @@ class ProcessNotificationJobTest extends TestCase
         $this->runJob($notification->id);
 
         $this->assertDatabaseHas('delivery_attempts', [
-            'notification_id'      => $notification->id,
+            'notification_id' => $notification->id,
             'is_transient_failure' => 0,
         ]);
     }
@@ -142,10 +141,11 @@ class ProcessNotificationJobTest extends TestCase
 
         try {
             $this->runJob($notification->id);
-        } catch (ProviderDeliveryException) {}
+        } catch (ProviderDeliveryException) {
+        }
 
         Event::assertDispatched(NotificationFailed::class,
-            fn($e) => $e->isPermanent === false && $e->notification->id === $notification->id
+            fn ($e) => $e->isPermanent === false && $e->notification->id === $notification->id
         );
     }
 
@@ -158,10 +158,11 @@ class ProcessNotificationJobTest extends TestCase
 
         try {
             $this->runJob($notification->id);
-        } catch (ProviderDeliveryException) {}
+        } catch (ProviderDeliveryException) {
+        }
 
         $this->assertDatabaseHas('delivery_attempts', [
-            'notification_id'      => $notification->id,
+            'notification_id' => $notification->id,
             'is_transient_failure' => 1,
         ]);
     }
@@ -208,7 +209,7 @@ class ProcessNotificationJobTest extends TestCase
         $this->assertEquals(NotificationStatus::FAILED, $notification->fresh()->status);
         $this->assertNotNull($notification->fresh()->failed_at);
         Event::assertDispatched(NotificationFailed::class,
-            fn($e) => $e->isPermanent === true && $e->notification->id === $notification->id
+            fn ($e) => $e->isPermanent === true && $e->notification->id === $notification->id
         );
     }
 }

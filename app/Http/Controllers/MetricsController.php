@@ -16,10 +16,13 @@ class MetricsController extends Controller
      *     tags={"Observability"},
      *     summary="Real-time metrics",
      *     description="Returns queue depths, sent/failed counts, and average latency per channel.",
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Metrics snapshot",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="data", type="object",
      *                 @OA\Property(property="notifications", type="object",
@@ -46,21 +49,21 @@ class MetricsController extends Controller
         $channels = $metrics->getSnapshot();
 
         $notifications = [
-            'sent'   => collect($channels)->sum('sent'),
+            'sent' => collect($channels)->sum('sent'),
             'failed' => collect($channels)->sum('failed'),
         ];
 
         $queues = collect(NotificationPriority::cases())
-            ->mapWithKeys(fn($p) => [
+            ->mapWithKeys(fn ($p) => [
                 $p->queueName() => ['depth' => (int) Redis::llen("queues:{$p->queueName()}")],
             ])
             ->all();
 
         return ApiResponse::success([
             'notifications' => $notifications,
-            'channels'      => $channels,
-            'queues'        => $queues,
-            'generated_at'  => now()->toIso8601String(),
+            'channels' => $channels,
+            'queues' => $queues,
+            'generated_at' => now()->toIso8601String(),
         ]);
     }
 }

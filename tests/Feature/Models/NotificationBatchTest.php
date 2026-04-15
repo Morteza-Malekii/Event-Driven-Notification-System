@@ -14,11 +14,11 @@ class NotificationBatchTest extends TestCase
     private function createBatch(array $attributes = []): NotificationBatch
     {
         return NotificationBatch::create(array_merge([
-            'status'         => BatchStatus::PENDING,
-            'total_count'    => 0,
-            'pending_count'  => 0,
-            'sent_count'     => 0,
-            'failed_count'   => 0,
+            'status' => BatchStatus::PENDING,
+            'total_count' => 0,
+            'pending_count' => 0,
+            'sent_count' => 0,
+            'failed_count' => 0,
             'canceled_count' => 0,
         ], $attributes));
     }
@@ -44,10 +44,10 @@ class NotificationBatchTest extends TestCase
     public function test_recalculate_status_completed(): void
     {
         $batch = $this->createBatch([
-            'total_count'    => 10,
-            'pending_count'  => 0,
-            'sent_count'     => 10,
-            'failed_count'   => 0,
+            'total_count' => 10,
+            'pending_count' => 0,
+            'sent_count' => 10,
+            'failed_count' => 0,
             'canceled_count' => 0,
         ]);
 
@@ -59,10 +59,10 @@ class NotificationBatchTest extends TestCase
     public function test_recalculate_status_failed(): void
     {
         $batch = $this->createBatch([
-            'total_count'    => 10,
-            'pending_count'  => 0,
-            'sent_count'     => 0,
-            'failed_count'   => 10,
+            'total_count' => 10,
+            'pending_count' => 0,
+            'sent_count' => 0,
+            'failed_count' => 10,
             'canceled_count' => 0,
         ]);
 
@@ -74,10 +74,10 @@ class NotificationBatchTest extends TestCase
     public function test_recalculate_status_partial_failed(): void
     {
         $batch = $this->createBatch([
-            'total_count'    => 10,
-            'pending_count'  => 0,
-            'sent_count'     => 7,
-            'failed_count'   => 3,
+            'total_count' => 10,
+            'pending_count' => 0,
+            'sent_count' => 7,
+            'failed_count' => 3,
             'canceled_count' => 0,
         ]);
 
@@ -89,10 +89,10 @@ class NotificationBatchTest extends TestCase
     public function test_recalculate_status_processing(): void
     {
         $batch = $this->createBatch([
-            'total_count'   => 10,
+            'total_count' => 10,
             'pending_count' => 5,
-            'sent_count'    => 5,
-            'failed_count'  => 0,
+            'sent_count' => 5,
+            'failed_count' => 0,
         ]);
 
         $batch->recalculateStatus();

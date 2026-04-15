@@ -26,9 +26,9 @@ class DeliveryAttempt extends Model
     ];
 
     protected $casts = [
-        'status'               => DeliveryAttemptStatus::class,
+        'status' => DeliveryAttemptStatus::class,
         'is_transient_failure' => 'boolean',
-        'attempted_at'         => 'datetime',
+        'attempted_at' => 'datetime',
     ];
 
     public function notification(): BelongsTo

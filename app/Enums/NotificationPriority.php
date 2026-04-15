@@ -10,6 +10,6 @@ enum NotificationPriority: string
 
     public function queueName(): string
     {
-        return 'notifications-' . $this->value;
+        return 'notifications-'.$this->value;
     }
 }
